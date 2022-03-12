@@ -7,27 +7,11 @@ use Illuminate\Http\Request;
 
 class PersonController extends Controller
 {
-    public function createPerson(Request $request){
-        $person = (object)json_decode($request->data);
-       // $person = $request;
-        $exist_name = Person::where('name',$person->name)->first();
-        $exist_lastname = Person::where('lastname',$person->lastname)->first();
+    public function createPerson(object $person){
         $exist_phone = Person::where('phone',$person->phone)->first();
         $response = [];
 
-        if($exist_name){
-            $response = [
-                'success'=>false,
-                'message'=>'name already exists',
-                'data'=>false
-            ];
-        }else if ($exist_lastname){
-            $response = [
-                'success'=>false,
-                'message'=>'lastname already exists',
-                'data'=>false
-            ];
-        }else if($exist_phone){
+       if($exist_phone){
             $response = [
                 'success'=>false,
                 'message'=>'phone already exists',
@@ -50,7 +34,7 @@ class PersonController extends Controller
         }
 
 
-        return response()->json($response);
+        return $response;
     }
 
 
@@ -79,21 +63,18 @@ class PersonController extends Controller
         if($find==null){
             $response = [
                 "success"=>false,
-                "message"=>"No data found",
-                "data"=>false
+                "message"=>"No data found"
             ];
         }else{
             $find->delete();
-            $current = Person::all();
             $response = [
                 "success"=>true,
-                "message"=>"Person identified and deleted",
-                "data"=>$current
+                "message"=>"Person identified and deleted"
             ];
         }
         
         
-        return response()->json($response);
+        return $response;
         
     }
 

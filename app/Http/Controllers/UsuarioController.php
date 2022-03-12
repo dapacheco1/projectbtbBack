@@ -2,47 +2,75 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Person;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\PersonController;
 
 class UsuarioController extends Controller
 {
     public function createUser(Request $request){
-        $usuario = (object)json_decode($request->data);
-
-        $exist_user = Usuario::where('username',$usuario->username)->first();
-        $exist_email = Usuario::where('email',$usuario->email)->first();
+        $data = (array)json_decode($request->data);
+        $usuario = $data["user"];
+        $person = $data["person"];
         $response = [];
 
-        if($exist_user){
-            $response = [
-                'success'=>false,
-                'message'=>'User already exists',
-                'data'=>false
-            ];
-        }else if ($exist_email){
-            $response = [
-                'success'=>false,
-                'message'=>'Email already exists',
-                'data'=>false
-            ];
-        }else{
-            $us = new Usuario();
-            $us->idPerson = $usuario->idPerson;
-            $us->username=$usuario->username;
-            $us->rol=$usuario->rol;
-            $us->password=Hash::make($usuario->password);
-            $us->email=$usuario->email;
-            $us->status=$usuario->status;
+        //validate person
+        $search = new PersonController;
+        $res = $search->createPerson($person);
+        $id = $res['data']['id'];
+        if($res['success']){
+            
+            $exist_user = Usuario::where('username',$usuario->username)->first();
+            $exist_email = Usuario::where('email',$usuario->email)->first();
+            
+            if($exist_email || $exist_user){
+                $deletep = new PersonController;
+                $resDel = $deletep->deletePerson($id);//debug message
+            }
+    
+            if($exist_user){
+                $response = [
+                    'success'=>false,
+                    'message'=>'Cannot create user: User already exists',
+                    'data'=>false
+                ];
 
-            $us->save();
+                
+            }else if ($exist_email){
+                $response = [
+                    'success'=>false,
+                    'message'=>'Cannot create user: Email already exists',
+                    'data'=>false
+                ];
+                
+            }else{
+                
+                $us = new Usuario();
+                $us->idPerson = $id;
+                $us->username=$usuario->username;
+                $us->rol=$usuario->rol;
+                $us->password=Hash::make($usuario->password);
+                $us->email=$usuario->email;
+                $us->status=$usuario->status;
+    
+                $us->save();
+                $response = [
+                    'success'=>true,
+                    'message'=>'User created',
+                    'data'=>$us
+                ];
+            }
+        }else{
             $response = [
-                'success'=>true,
-                'message'=>'User created',
-                'data'=>$us
+                'success'=>false,
+                'message'=>'Cannot create user: '.$res['message'],
+                'data'=>false
             ];
         }
+
+        
 
 
         return response()->json($response);
