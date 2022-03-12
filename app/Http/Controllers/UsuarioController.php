@@ -29,7 +29,7 @@ class UsuarioController extends Controller
             ];
         }else{
             $us = new Usuario();
-
+            $us->idPerson = $usuario->idPerson;
             $us->username=$usuario->username;
             $us->rol=$usuario->rol;
             $us->password=Hash::make($usuario->password);

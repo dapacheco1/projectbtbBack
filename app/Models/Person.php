@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Usuario extends Model
+class Person extends Model
 {
     use HasFactory;
-    protected $table="usuarios";
-    protected $filleable = ['idPerson','username','rol','password','email','status'];
+    protected $table="persons";
+    protected $filleable = ['name','lastname','phone','direction','status'];
 }
