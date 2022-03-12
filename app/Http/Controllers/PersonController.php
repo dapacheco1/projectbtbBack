@@ -54,7 +54,7 @@ class PersonController extends Controller
                 'data'=>false
             ];
         }
-        return response()->json($response);
+        return $response;
     }
 
     public function deletePerson($idPerson){

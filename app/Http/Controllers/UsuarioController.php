@@ -19,9 +19,9 @@ class UsuarioController extends Controller
         //validate person
         $search = new PersonController;
         $res = $search->createPerson($person);
-        $id = $res['data']['id'];
+        
         if($res['success']){
-            
+            $id = $res['data']['id'];
             $exist_user = Usuario::where('username',$usuario->username)->first();
             $exist_email = Usuario::where('email',$usuario->email)->first();
             
@@ -78,6 +78,7 @@ class UsuarioController extends Controller
 
     public function getUsers(){
         $users=Usuario::all();
+        
         $response = [];
         if(sizeof($users)!=0){
             $response = [
