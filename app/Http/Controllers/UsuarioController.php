@@ -97,7 +97,8 @@ class UsuarioController extends Controller
     }
 
     public function searchUser(Request $request){
-        $user = (object)json_decode($request->data);
+        //$user = (object)json_decode($request->data);
+        $user = $request;
         $response = [];
         $exist_user = Usuario::where('username',$user->username)->first();
         if($exist_user){
@@ -105,15 +106,13 @@ class UsuarioController extends Controller
                 $response = [
                     'success' => true,
                     'message' => 'Welcome to the app',
-                    'data' => $exist_user,
-                    'url' => '/crud'
+                    'data' => $exist_user
                 ];
             }else{
                 $response = [
                     'success' => false,
                     'message' => 'password doesnt match',
-                    'data' => false,
-                    'url' =>false
+                    'data' => false
                 ];
             }
 
@@ -121,8 +120,7 @@ class UsuarioController extends Controller
             $response = [
                 'success' => false,
                 'message' => 'user doesnt match',
-                'data' => false,
-                'url' => false
+                'data' => false
             ];
         }
         return response()->json($response);
