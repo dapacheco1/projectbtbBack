@@ -78,5 +78,26 @@ class PersonController extends Controller
         
     }
 
+    public function getPersonById($idPerson){
+        $find = Person::find($idPerson);
+        $response = [];
+        if($find==null){
+            $response = [
+                "success"=>false,
+                "message"=>"No data found",
+                "data"=>false,
+            ];
+        }else{
+            $response = [
+                "success"=>true,
+                "message"=>"Person identified",
+                "data"=>$find
+            ];
+        }
+        
+        
+        return $response;
+    }
+
     
 }

@@ -81,10 +81,17 @@ class UsuarioController extends Controller
         
         $response = [];
         if(sizeof($users)!=0){
+            $auxPrs = new PersonController;
+            $search = [];
+            foreach($users as $user){
+                array_push($search,$auxPrs->getPersonById($user["idPerson"]));
+            }
+            
+            
             $response = [
                 'success'=>true,
                 'message'=>'This is all users from database',
-                'data'=>$users
+                'data'=>array($users,$search)
             ];
         }else{
             $response = [
@@ -125,5 +132,35 @@ class UsuarioController extends Controller
         }
         return response()->json($response);
 
+    }
+
+    public function deleteUser($id){
+        $find = Usuario::find($id);
+        $response = [];
+        if($find==null){
+            $response = [
+                "success"=>false,
+                "message"=>"No data found"
+            ];
+        }else{
+            $auxP = new PersonController;
+            $deleteP =$auxP->deletePerson($find->idPerson);
+            if($deleteP["success"]){
+                $find->delete();
+                $response = [
+                    "success"=>true,
+                    "message"=>"Person identified and deleted"
+                ];
+            }else{
+                $response = [
+                    "success"=>false,
+                    "message"=>"An error has occurred"
+                ];
+            }
+           
+        }
+        
+        
+        return $response;
     }
 }
