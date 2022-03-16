@@ -10,6 +10,12 @@ use App\Http\Controllers\PersonController;
 
 class UsuarioController extends Controller
 {
+    private $personCtrl;
+
+    public function __construct(){
+        $this->personCtrl = new PersonController();
+    }
+
     public function createUser(Request $request){
         $data = (array)json_decode($request->data);
         $usuario = $data["user"];
@@ -77,21 +83,17 @@ class UsuarioController extends Controller
     }
 
     public function getUsers(){
-        $users=Usuario::all();
-        
+        $users = Usuario::where('status', 'A')->get();
         $response = [];
-        if(sizeof($users)!=0){
-            $auxPrs = new PersonController;
-            $search = [];
-            foreach($users as $user){
-                array_push($search,$auxPrs->getPersonById($user["idPerson"]));
-            }
-            
+
+        if($users->count() > 0){
+            foreach($users as $u)
+                $u->person;
             
             $response = [
-                'success'=>true,
-                'message'=>'This is all users from database',
-                'data'=>array($users,$search)
+                'success'=> true,
+                'message'=>'Data',
+                'data'=> $users
             ];
         }else{
             $response = [
@@ -100,6 +102,7 @@ class UsuarioController extends Controller
                 'data'=>false
             ];
         }
+
         return response()->json($response);
     }
 
@@ -162,5 +165,73 @@ class UsuarioController extends Controller
         
         
         return $response;
+    }
+
+    public function updateUser(Request $request){
+      
+        $data = $request;               $response = [];
+        $usuario = $data->user;         $person = $data->person;
+       
+        $find = Usuario::find($usuario["id"]);
+        $usuario["idPerson"] = $person["id"];
+        if($find == null){
+            $response = [
+                "success" => false,
+                "message" => "No data found",
+                "data" => false
+            ];
+        }else{
+            //validate person
+            $updateP = $this->personCtrl->updatePerson($person["id"], $person);
+            $usuario["password"] = Hash::make($usuario["password"]);
+
+            if($updateP["success"]){
+                $find->update($usuario);
+                $response = [
+                    "success"=>true,
+                    "message"=>"User identified and updated"
+                ];
+            }else{
+                $response = [
+                    "success"=>false,
+                    "message"=>"An error has occurred"
+                ];
+            }
+
+            
+        }
+
+        return response()->json($response);
+    }
+
+    public function find($id, $estado){
+        $response = [];
+
+        if($estado == 'A' || $estado == 'I'){
+            $user = Usuario::where('id', $id)->where('status', $estado)->first();
+    
+            if($user){
+                $user->person;
+    
+                $response = [
+                    'success' => true,
+                    'message' => 'User exist',
+                    'data' => $user
+                ];
+            }else{
+                $response = [
+                    'success' => false,
+                    'message' => 'No exist user',
+                    'data' => false
+                ];
+            }
+        }else
+        $response = [
+            'success' => false,
+            'message' => 'Status no valid',
+            'data' => false
+        ];
+
+        return response()->json($response);
     }
 }

@@ -99,5 +99,27 @@ class PersonController extends Controller
         return $response;
     }
 
+    public function updatePerson($idPerson,$data){
+
+        $find = Person::find($idPerson);
+        $response = [];
+        
+        if($find==null){
+            $response = [
+                "success"=>false,
+                "message"=>"No data found"
+            ];
+        }else{
+            $find->update($data);
+            $response = [
+                "success"=>true,
+                "message"=>"Person identified and updated"
+            ];
+        }
+        
+        
+        return $response;
+    }
+
     
 }

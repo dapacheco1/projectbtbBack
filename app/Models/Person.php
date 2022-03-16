@@ -9,5 +9,12 @@ class Person extends Model
 {
     use HasFactory;
     protected $table="persons";
-    protected $filleable = ['name','lastname','phone','direction','status'];
+    protected $fillable = ['name','lastname','phone','direction','status'];
+
+    //Configurar relacion inversa (uno a uno)
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'idPerson', 'id');
+    }
+
 }
